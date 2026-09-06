@@ -1,0 +1,134 @@
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,300;1,9..144,400&family=Outfit:wght@300;400;500;600;700&display=swap');
+@import 'tailwindcss';
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-border: var(--border);
+  --color-ring: var(--ring);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: var(--radius);
+  --radius-lg: calc(var(--radius) + 4px);
+  --radius-xl: calc(var(--radius) + 12px);
+  --radius-2xl: calc(var(--radius) + 24px);
+}
+
+:root {
+  --background: #f6f5f8;
+  --foreground: #111118;
+  --card: #ffffff;
+  --card-foreground: #111118;
+  --primary: #7c3aed;
+  --primary-foreground: #ffffff;
+  --secondary: #ede9fe;
+  --secondary-foreground: #5b21b6;
+  --muted: #ede9fe;
+  --muted-foreground: #6b7280;
+  --accent: #7c3aed;
+  --accent-foreground: #ffffff;
+  --border: #e5e0f0;
+  --ring: #7c3aed;
+  --radius: 16px;
+}
+
+.dark {
+  --background: #0d0c12;
+  --foreground: #f0eeff;
+  --card: #16141e;
+  --card-foreground: #f0eeff;
+  --primary: #a78bfa;
+  --primary-foreground: #0d0c12;
+  --secondary: #1e1b2e;
+  --secondary-foreground: #c4b5fd;
+  --muted: #1e1b2e;
+  --muted-foreground: #9ca3af;
+  --accent: #a78bfa;
+  --accent-foreground: #0d0c12;
+  --border: #2a2540;
+  --ring: #a78bfa;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+}
+
+*:hover {
+  scrollbar-color: var(--border) transparent;
+}
+
+body {
+  font-family: 'Outfit', system-ui, sans-serif;
+  background-color: var(--background);
+  color: var(--foreground);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.font-display {
+  font-family: 'Fraunces', Georgia, serif;
+}
+
+/* Glassmorphism utility */
+.glass {
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+}
+
+/* Animated gradient background for home */
+.hero-gradient {
+  background:
+    radial-gradient(ellipse 80% 60% at 20% 30%, rgba(124, 58, 237, 0.12) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 50% at 80% 70%, rgba(167, 139, 250, 0.1) 0%, transparent 55%),
+    var(--background);
+}
+
+.dark .hero-gradient {
+  background:
+    radial-gradient(ellipse 80% 60% at 20% 30%, rgba(124, 58, 237, 0.25) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 50% at 80% 70%, rgba(167, 139, 250, 0.15) 0%, transparent 55%),
+    var(--background);
+}
+
+/* Floating card blob */
+.blob-bg {
+  background:
+    radial-gradient(ellipse 100% 60% at 50% 0%, rgba(124, 58, 237, 0.15) 0%, transparent 70%),
+    var(--card);
+}
+
+.dark .blob-bg {
+  background:
+    radial-gradient(ellipse 100% 60% at 50% 0%, rgba(124, 58, 237, 0.3) 0%, transparent 70%),
+    var(--card);
+}
+
+/* Audio waveform animation */
+@keyframes wave {
+  0%, 100% { transform: scaleY(0.4); }
+  50% { transform: scaleY(1); }
+}
+
+.bar-animate {
+  animation: wave 1s ease-in-out infinite;
+}
+
+.bar-animate:nth-child(2) { animation-delay: 0.1s; }
+.bar-animate:nth-child(3) { animation-delay: 0.2s; }
+.bar-animate:nth-child(4) { animation-delay: 0.3s; }
+.bar-animate:nth-child(5) { animation-delay: 0.15s; }
