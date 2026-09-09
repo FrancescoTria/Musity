@@ -2,10 +2,9 @@ import { useTheme } from "../context/ThemeContext";
 
 interface BrandLogoProps {
     size?: "sm" | "md";
-    showName?: boolean;
 }
 
-export default function BrandLogo({ size = "md", showName = true }: BrandLogoProps) {
+export default function BrandLogo({ size = "md" }: BrandLogoProps) {
     const { theme } = useTheme();
     const circleSize = size === "sm" ? "h-6 w-6 text-sm" : "h-8 w-8 text-lg";
 
@@ -18,7 +17,7 @@ export default function BrandLogo({ size = "md", showName = true }: BrandLogoPro
             >
                 ♪
             </span>
-            {showName && <span className="font-display text-lg font-bold tracking-tight">Musity</span>}
+            <span className="font-display text-lg font-bold tracking-tight">Musity</span>
         </div>
     );
 }

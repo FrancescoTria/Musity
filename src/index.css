@@ -96,14 +96,6 @@ button:disabled,
 }
 
 
-/* Glassmorphism utility */
-
-.glass {
-    backdrop-filter: blur(20px) saturate(180%);
-    -webkit-backdrop-filter: blur(20px) saturate(180%);
-}
-
-
 /* Animated gradient background for home */
 
 .hero-gradient {

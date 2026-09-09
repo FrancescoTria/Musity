@@ -94,7 +94,7 @@ export default function GamePage() {
         }
     };
 
-    const prepareRound = (nextRound: number, nextTracks: ItunesTrack[]) => {
+    const prepareRound = (nextRound: number) => {
         setRound(nextRound);
         setStage(0);
         setLocked(false);
@@ -121,7 +121,7 @@ export default function GamePage() {
             setChartTracks(playableChart);
             setTracks(playable);
             setCorrectCount(0);
-            prepareRound(0, playable);
+            prepareRound(0);
         } catch (loadError) {
             setError(loadError instanceof Error ? loadError.message : "Impossibile caricare la classifica.");
             setStatus("setup");
@@ -203,7 +203,7 @@ export default function GamePage() {
         if (nextRound >= TOTAL_ROUNDS) {
             setStatus("finished");
         } else {
-            prepareRound(nextRound, tracks);
+            prepareRound(nextRound);
         }
     };
 

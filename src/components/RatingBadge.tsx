@@ -4,25 +4,11 @@ interface RatingBadgeProps {
   label: SteamLabel;
   avg: number;
   count: number;
-  layout?: "horizontal" | "vertical";
 }
 
-export default function RatingBadge({ label, avg, count, layout = "vertical" }: RatingBadgeProps) {
+export default function RatingBadge({ label, avg, count }: RatingBadgeProps) {
   const color = getLabelColor(label);
   const pct = Math.round((avg / 10) * 100);
-
-  if (layout === "horizontal") {
-    return (
-      <div className="flex items-center gap-3">
-        <span className={`text-sm font-semibold ${color}`}>{label}</span>
-        {count > 0 && (
-          <span className="text-xs" style={{ color: "var(--muted-foreground)" }}>
-            ({count} {count === 1 ? "review" : "reviews"})
-          </span>
-        )}
-      </div>
-    );
-  }
 
   return (
     <div className="flex flex-col gap-1">
@@ -50,8 +36,8 @@ export default function RatingBadge({ label, avg, count, layout = "vertical" }: 
                 avg >= 7
                   ? "linear-gradient(90deg, #10b981, #34d399)"
                   : avg >= 5
-                  ? "linear-gradient(90deg, #f59e0b, #fbbf24)"
-                  : "linear-gradient(90deg, #ef4444, #f87171)",
+                    ? "linear-gradient(90deg, #f59e0b, #fbbf24)"
+                    : "linear-gradient(90deg, #ef4444, #f87171)",
             }}
           />
         </div>

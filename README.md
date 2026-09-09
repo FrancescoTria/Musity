@@ -6,6 +6,8 @@ Musity è una piattaforma web per cercare brani musicali, ascoltarne una preview
 
 - Ricerca di brani, artisti e album tramite iTunes Search API.
 - Sezione di esplorazione con 9 brani casuali provenienti dalle classifiche Apple Music internazionali.
+- Pagina con le Top 100 Apple Music complete per paese, con ricerca interna e selezione della nazione.
+- Minigioco per indovinare i brani della Top scelta ascoltando preview progressive da 1, 3, 6, 10 e 30 secondi.
 - Pagina di dettaglio con copertina, artista, album, genere, anno, durata e numero della traccia.
 - Riproduzione della preview audio quando disponibile.
 - Valutazione da 1 a 10 con classificazione in stile Steam.
@@ -14,13 +16,14 @@ Musity è una piattaforma web per cercare brani musicali, ascoltarne una preview
 - Ordinamento delle recensioni per piu recenti, voto piu alto o voto piu basso.
 - Voti di utilita sulle recensioni.
 - Tema chiaro e scuro, con salvataggio della preferenza.
+- Logo Musity e favicon personalizzati.
 
 ## Tecnologie utilizzate
 
 - **React 19** per la costruzione dell'interfaccia.
 - **TypeScript** per tipizzazione e maggiore sicurezza del codice.
 - **Vite** per sviluppo locale e build di produzione.
-- **React Router** per la navigazione tra home e pagine dei brani.
+- **React Router** per la navigazione tra home, classifiche, gioco e pagine dei brani.
 - **Tailwind CSS** per gli stili e il layout responsive.
 - **iTunes Search API** per ricerca e metadati musicali.
 - **Apple Music RSS API** per il recupero delle classifiche internazionali.
@@ -45,12 +48,15 @@ Musity/
 │   │   ├── ReviewForm.tsx     # Form per creare una recensione
 │   │   ├── SearchBar.tsx      # Ricerca con suggerimenti e debounce
 │   │   ├── StarRating.tsx     # Selezione del voto da 1 a 10
-│   │   └── ThemeToggle.tsx    # Cambio del tema chiaro/scuro
+│   │   ├── ThemeToggle.tsx    # Cambio del tema chiaro/scuro
+│   │   └── BrandLogo.tsx      # Logo condiviso dell'applicazione
 │   ├── context/
 │   │   └── ThemeContext.tsx   # Stato globale e persistenza del tema
 │   ├── pages/
 │   │   ├── HomePage.tsx       # Home, ricerca ed esplorazione
-│   │   └── TrackPage.tsx      # Dettaglio, player e recensioni
+│   │   ├── TrackPage.tsx      # Dettaglio, player e recensioni
+│   │   ├── ChartsPage.tsx     # Top 100 nazionali complete
+│   │   └── GamePage.tsx       # Minigioco musicale
 │   └── utils/
 │       ├── itunes.ts          # Chiamate API e formattazione dei dati
 │       └── ratings.ts         # Gestione recensioni e statistiche dei voti
@@ -75,7 +81,15 @@ Il form richiede un nome, un voto da 1 a 10 e una recensione di almeno 20 caratt
 
 Se non esistono recensioni locali, vengono mostrate tre recensioni dimostrative definite nel codice, uguali su ogni dispositivo. Le recensioni create dall'utente e i voti di utilita restano invece salvati nel `localStorage` del browser e non vengono sincronizzati con altri dispositivi.
 
-### 4. Tema
+### 4. Classifiche nazionali
+
+La pagina `/charts` permette di scegliere una delle Top Apple Music disponibili per paese. La classifica completa mantiene l'ordine originale, può essere filtrata per titolo o artista e ogni brano apre la relativa pagina di dettaglio. Il paese selezionato viene salvato nell'URL, così resta invariato tornando indietro dal dettaglio.
+
+### 5. Minigioco musicale
+
+La pagina `/game` permette di selezionare una Top nazionale e giocare cinque round. Per ogni brano la preview viene sbloccata progressivamente: 1, 3, 6, 10 e infine 30 secondi. Il brano si indovina tramite una ricerca limitata esclusivamente ai brani della Top scelta. I tentativi e i salti vengono mostrati negli slot del round; al termine viene indicato il numero di canzoni indovinate nella Top selezionata.
+
+### 6. Tema
 
 `ThemeContext` gestisce il tema chiaro o scuro. All'avvio viene usata la preferenza salvata dall'utente; in assenza di una preferenza viene rilevata quella del sistema operativo. La scelta viene salvata in `localStorage`.
 
@@ -115,4 +129,5 @@ Le richieste al feed Apple Music passano dal percorso locale `/api/apple-music`.
 - Non è presente un backend per autenticazione, utenti o sincronizzazione delle recensioni.
 - Le recensioni sono locali al browser e possono essere cancellate eliminando i dati del sito.
 - La disponibilità delle preview dipende dai dati restituiti da Apple.
+- Il minigioco richiede almeno cinque brani della Top selezionata con una preview audio disponibile.
 - La piattaforma richiede una connessione Internet per ricerca, classifiche, immagini e preview.

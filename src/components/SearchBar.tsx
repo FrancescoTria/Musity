@@ -125,7 +125,7 @@ export default function SearchBar({ large = false, initialValue = "", onSelect, 
             borderColor: "var(--border)",
           }}
         >
-          {results.map((track, idx) => (
+          {results.map((track) => (
             <button
               key={track.trackId}
               onClick={() => select(track)}
