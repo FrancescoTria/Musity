@@ -10,6 +10,7 @@ Musity è una piattaforma web per cercare brani musicali, ascoltarne una preview
 - Riproduzione della preview audio quando disponibile.
 - Valutazione da 1 a 10 con classificazione in stile Steam.
 - Pubblicazione di recensioni con nome, testo e frequenza di ascolto.
+- Tre recensioni dimostrative predefinite per ogni brano, visibili su qualsiasi dispositivo.
 - Ordinamento delle recensioni per piu recenti, voto piu alto o voto piu basso.
 - Voti di utilita sulle recensioni.
 - Tema chiaro e scuro, con salvataggio della preferenza.
@@ -72,7 +73,7 @@ La sezione **Esplora** recupera le classifiche Apple Music di diversi storefront
 
 Il form richiede un nome, un voto da 1 a 10 e una recensione di almeno 20 caratteri. Ogni recensione viene salvata localmente con una chiave associata all'ID del brano (`reviews_<trackId>`). La pagina calcola il voto medio, visualizza la distribuzione dei voti e assegna un'etichetta descrittiva come `Very Positive` o `Mixed`.
 
-Le recensioni non vengono inviate a un server: sono quindi visibili soltanto nello stesso browser e dispositivo in cui sono state create.
+Se non esistono recensioni locali, vengono mostrate tre recensioni dimostrative definite nel codice, uguali su ogni dispositivo. Le recensioni create dall'utente e i voti di utilita restano invece salvati nel `localStorage` del browser e non vengono sincronizzati con altri dispositivi.
 
 ### 4. Tema
 

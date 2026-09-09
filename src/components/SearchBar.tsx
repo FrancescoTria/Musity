@@ -5,9 +5,11 @@ import { ItunesTrack, searchTracks, getArtwork } from "../utils/itunes";
 interface SearchBarProps {
   large?: boolean;
   initialValue?: string;
+  onSelect?: (track: ItunesTrack) => void;
+  searchProvider?: (query: string) => Promise<ItunesTrack[]>;
 }
 
-export default function SearchBar({ large = false, initialValue = "" }: SearchBarProps) {
+export default function SearchBar({ large = false, initialValue = "", onSelect, searchProvider }: SearchBarProps) {
   const [query, setQuery] = useState(initialValue);
   const [results, setResults] = useState<ItunesTrack[]>([]);
   const [loading, setLoading] = useState(false);
@@ -21,7 +23,7 @@ export default function SearchBar({ large = false, initialValue = "" }: SearchBa
     if (!q.trim()) { setResults([]); setOpen(false); return; }
     setLoading(true);
     try {
-      const res = await searchTracks(q, 8);
+      const res = searchProvider ? await searchProvider(q) : await searchTracks(q, 8);
       setResults(res);
       setOpen(true);
     } catch {
@@ -29,7 +31,7 @@ export default function SearchBar({ large = false, initialValue = "" }: SearchBa
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [searchProvider]);
 
   useEffect(() => {
     if (debounceRef.current) clearTimeout(debounceRef.current);
@@ -49,7 +51,11 @@ export default function SearchBar({ large = false, initialValue = "" }: SearchBa
   const select = (track: ItunesTrack) => {
     setOpen(false);
     setQuery(track.trackName);
-    navigate(`/track/${track.trackId}`, { state: { track } });
+    if (onSelect) {
+      onSelect(track);
+    } else {
+      navigate(`/track/${track.trackId}`, { state: { track } });
+    }
   };
 
   const inputBase = large

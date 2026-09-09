@@ -7,7 +7,7 @@ interface ThemeContextType {
   toggle: () => void;
 }
 
-const ThemeContext = createContext<ThemeContextType>({ theme: "dark", toggle: () => {} });
+const ThemeContext = createContext<ThemeContextType>({ theme: "dark", toggle: () => { } });
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const [theme, setTheme] = useState<Theme>(() => {

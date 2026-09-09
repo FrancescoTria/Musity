@@ -10,6 +10,8 @@ export interface Review {
   playtime: string;
 }
 
+export type VoteType = "helpful" | "notHelpful";
+
 export type SteamLabel =
   | "Overwhelmingly Positive"
   | "Very Positive"
@@ -44,12 +46,51 @@ export function getLabelColor(label: SteamLabel): string {
   }
 }
 
+const demoReviewTemplates: Omit<Review, "id" | "trackId">[] = [
+  {
+    author: "Luca B.",
+    rating: 9,
+    text: "Un brano davvero riuscito, con un'atmosfera che resta in testa anche dopo l'ascolto.",
+    date: "2025-02-14T10:00:00.000Z",
+    helpful: 18,
+    notHelpful: 1,
+    playtime: "Ascoltata spesso",
+  },
+  {
+    author: "Marta R.",
+    rating: 8,
+    text: "Produzione molto curata e ritornello efficace. La riascolterei volentieri.",
+    date: "2025-01-28T10:00:00.000Z",
+    helpful: 11,
+    notHelpful: 2,
+    playtime: "Qualche ascolto",
+  },
+  {
+    author: "Andrea P.",
+    rating: 7,
+    text: "Una buona canzone, piacevole da ascoltare e con qualche dettaglio interessante.",
+    date: "2024-12-09T10:00:00.000Z",
+    helpful: 7,
+    notHelpful: 1,
+    playtime: "Prima volta",
+  },
+];
+
+function getDemoReviews(trackId: number): Review[] {
+  return demoReviewTemplates.map((review, index) => ({
+    ...review,
+    id: `demo-${trackId}-${index + 1}`,
+    trackId,
+  }));
+}
+
 export function getReviews(trackId: number): Review[] {
   try {
     const stored = localStorage.getItem(`reviews_${trackId}`);
-    return stored ? JSON.parse(stored) : [];
+    const reviews = stored ? JSON.parse(stored) : [];
+    return reviews.length > 0 ? reviews : getDemoReviews(trackId);
   } catch {
-    return [];
+    return getDemoReviews(trackId);
   }
 }
 
@@ -67,13 +108,45 @@ export function saveReview(review: Review): void {
 export function voteReview(
   trackId: number,
   reviewId: string,
-  type: "helpful" | "notHelpful"
+  previousType: VoteType | null,
+  newType: VoteType
 ): void {
   const reviews = getReviews(trackId);
   const review = reviews.find((r) => r.id === reviewId);
   if (!review) return;
-  review[type] += 1;
+
+  if (previousType) {
+    review[previousType] = Math.max(0, review[previousType] - 1);
+  }
+
+  if (previousType !== newType) {
+    review[newType] += 1;
+  }
+
   localStorage.setItem(`reviews_${trackId}`, JSON.stringify(reviews));
+}
+
+export function getSavedVote(trackId: number, reviewId: string): VoteType | null {
+  try {
+    const saved = localStorage.getItem(`review_vote_${trackId}_${reviewId}`);
+    return saved === "helpful" || saved === "notHelpful" ? saved : null;
+  } catch {
+    return null;
+  }
+}
+
+export function saveVote(
+  trackId: number,
+  reviewId: string,
+  vote: VoteType | null
+): void {
+  const key = `review_vote_${trackId}_${reviewId}`;
+
+  if (vote) {
+    localStorage.setItem(key, vote);
+  } else {
+    localStorage.removeItem(key);
+  }
 }
 
 export function getAverageRating(reviews: Review[]): number {

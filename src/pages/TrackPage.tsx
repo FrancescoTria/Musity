@@ -8,10 +8,13 @@ import ReviewForm from "../components/ReviewForm";
 import RatingBadge from "../components/RatingBadge";
 import SearchBar from "../components/SearchBar";
 import ThemeToggle from "../components/ThemeToggle";
+import BrandLogo from "../components/BrandLogo";
+import { useTheme } from "../context/ThemeContext";
 
 type SortKey = "recent" | "top" | "lowest";
 
 export default function TrackPage() {
+  const { theme } = useTheme();
   const { trackId } = useParams<{ trackId: string }>();
   const location = useLocation();
   const navigate = useNavigate();
@@ -67,6 +70,7 @@ export default function TrackPage() {
   const label = getSteamLabel(avg, reviews.length);
   const artwork = track ? getArtwork(track.artworkUrl100, 600) : "";
   const artworkThumb = track ? getArtwork(track.artworkUrl100, 100) : "";
+  const heroNavColor = theme === "dark" ? "#ffffff" : "#111118";
 
   if (loading) {
     return (
@@ -111,18 +115,16 @@ export default function TrackPage() {
           <div className="flex items-center gap-3">
             <button
               onClick={() => navigate(-1)}
-              className="flex items-center gap-1.5 text-white/80 hover:text-white text-sm transition-colors"
+              className="flex items-center gap-1.5 text-sm transition-colors"
+              style={{ color: heroNavColor }}
             >
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M19 12H5M12 5l-7 7 7 7" />
               </svg>
               Indietro
             </button>
-            <Link to="/" className="flex items-center gap-1.5 text-white/60 hover:text-white text-sm transition-colors">
-              <div className="w-6 h-6 rounded-lg flex items-center justify-center text-xs" style={{ background: "var(--primary)" }}>
-                ♪
-              </div>
-              Sounify
+            <Link to="/" className="transition-colors" style={{ color: heroNavColor }}>
+              <BrandLogo size="sm" />
             </Link>
           </div>
           <div className="flex items-center gap-4">

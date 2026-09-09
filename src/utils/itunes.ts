@@ -43,6 +43,72 @@ interface AppleChartResponse {
 
 const NON_AMERICAN_STOREFRONTS = ["it", "gb", "jp", "de", "fr", "es", "au", "kr", "in"];
 
+export const APPLE_MUSIC_COUNTRIES = [
+  { code: "us", name: "Stati Uniti", flag: "🇺🇸" },
+  { code: "ca", name: "Canada", flag: "🇨🇦" },
+  { code: "mx", name: "Messico", flag: "🇲🇽" },
+  { code: "br", name: "Brasile", flag: "🇧🇷" },
+  { code: "ar", name: "Argentina", flag: "🇦🇷" },
+  { code: "cl", name: "Cile", flag: "🇨🇱" },
+  { code: "co", name: "Colombia", flag: "🇨🇴" },
+  { code: "pe", name: "Perù", flag: "🇵🇪" },
+  { code: "ec", name: "Ecuador", flag: "🇪🇨" },
+  { code: "cr", name: "Costa Rica", flag: "🇨🇷" },
+  { code: "gb", name: "Regno Unito", flag: "🇬🇧" },
+  { code: "ie", name: "Irlanda", flag: "🇮🇪" },
+  { code: "de", name: "Germania", flag: "🇩🇪" },
+  { code: "fr", name: "Francia", flag: "🇫🇷" },
+  { code: "es", name: "Spagna", flag: "🇪🇸" },
+  { code: "it", name: "Italia", flag: "🇮🇹" },
+  { code: "pt", name: "Portogallo", flag: "🇵🇹" },
+  { code: "nl", name: "Paesi Bassi", flag: "🇳🇱" },
+  { code: "be", name: "Belgio", flag: "🇧🇪" },
+  { code: "ch", name: "Svizzera", flag: "🇨🇭" },
+  { code: "at", name: "Austria", flag: "🇦🇹" },
+  { code: "dk", name: "Danimarca", flag: "🇩🇰" },
+  { code: "se", name: "Svezia", flag: "🇸🇪" },
+  { code: "no", name: "Norvegia", flag: "🇳🇴" },
+  { code: "fi", name: "Finlandia", flag: "🇫🇮" },
+  { code: "is", name: "Islanda", flag: "🇮🇸" },
+  { code: "pl", name: "Polonia", flag: "🇵🇱" },
+  { code: "cz", name: "Repubblica Ceca", flag: "🇨🇿" },
+  { code: "sk", name: "Slovacchia", flag: "🇸🇰" },
+  { code: "hu", name: "Ungheria", flag: "🇭🇺" },
+  { code: "ro", name: "Romania", flag: "🇷🇴" },
+  { code: "bg", name: "Bulgaria", flag: "🇧🇬" },
+  { code: "gr", name: "Grecia", flag: "🇬🇷" },
+  { code: "hr", name: "Croazia", flag: "🇭🇷" },
+  { code: "si", name: "Slovenia", flag: "🇸🇮" },
+  { code: "rs", name: "Serbia", flag: "🇷🇸" },
+  { code: "ua", name: "Ucraina", flag: "🇺🇦" },
+  { code: "ee", name: "Estonia", flag: "🇪🇪" },
+  { code: "lv", name: "Lettonia", flag: "🇱🇻" },
+  { code: "lt", name: "Lituania", flag: "🇱🇹" },
+  { code: "tr", name: "Turchia", flag: "🇹🇷" },
+  { code: "au", name: "Australia", flag: "🇦🇺" },
+  { code: "nz", name: "Nuova Zelanda", flag: "🇳🇿" },
+  { code: "jp", name: "Giappone", flag: "🇯🇵" },
+  { code: "kr", name: "Corea del Sud", flag: "🇰🇷" },
+  { code: "cn", name: "Cina", flag: "🇨🇳" },
+  { code: "hk", name: "Hong Kong", flag: "🇭🇰" },
+  { code: "tw", name: "Taiwan", flag: "🇹🇼" },
+  { code: "sg", name: "Singapore", flag: "🇸🇬" },
+  { code: "my", name: "Malesia", flag: "🇲🇾" },
+  { code: "id", name: "Indonesia", flag: "🇮🇩" },
+  { code: "ph", name: "Filippine", flag: "🇵🇭" },
+  { code: "th", name: "Thailandia", flag: "🇹🇭" },
+  { code: "in", name: "India", flag: "🇮🇳" },
+  { code: "il", name: "Israele", flag: "🇮🇱" },
+  { code: "ae", name: "Emirati Arabi Uniti", flag: "🇦🇪" },
+  { code: "sa", name: "Arabia Saudita", flag: "🇸🇦" },
+  { code: "qa", name: "Qatar", flag: "🇶🇦" },
+  { code: "kw", name: "Kuwait", flag: "🇰🇼" },
+  { code: "eg", name: "Egitto", flag: "🇪🇬" },
+  { code: "za", name: "Sudafrica", flag: "🇿🇦" },
+  { code: "ng", name: "Nigeria", flag: "🇳🇬" },
+  { code: "ke", name: "Kenya", flag: "🇰🇪" },
+];
+
 export function getArtwork(url: string, size = 600): string {
   return url.replace("100x100bb", `${size}x${size}bb`);
 }
@@ -82,13 +148,30 @@ export async function getRandomAppleChartTracks(): Promise<ItunesTrack[]> {
   return enrichAppleChartTracks(songs);
 }
 
-async function enrichAppleChartTracks(songs: AppleChartSong[]): Promise<ItunesTrack[]> {
-  const randomSongs = [...songs].sort(() => Math.random() - 0.5).slice(0, 9);
-  const ids = randomSongs.map((song) => song.id);
+export async function getAppleChartTracks(
+  storefront: string,
+  limit = 25,
+): Promise<ItunesTrack[]> {
+  const res = await fetch(`/api/apple-music/api/v2/${storefront}/music/most-played/${limit}/songs.json`);
+  if (!res.ok) throw new Error("Apple Music chart unavailable");
+  const data: AppleChartResponse = await res.json();
+  return enrichAppleChartTracks(data.feed.results, limit);
+}
+
+export async function getFullAppleChartTracks(storefront: string): Promise<ItunesTrack[]> {
+  const res = await fetch(`/api/apple-music/api/v2/${storefront}/music/most-played/100/songs.json`);
+  if (!res.ok) throw new Error("Apple Music chart unavailable");
+  const data: AppleChartResponse = await res.json();
+  return enrichAppleChartTracks(data.feed.results, 100, false);
+}
+
+async function enrichAppleChartTracks(songs: AppleChartSong[], limit = 9, randomize = true): Promise<ItunesTrack[]> {
+  const selectedSongs = randomize ? [...songs].sort(() => Math.random() - 0.5).slice(0, limit) : songs.slice(0, limit);
+  const ids = selectedSongs.map((song) => song.id);
   const itunesTracks = ids.length ? await lookupTracks(ids) : [];
   const tracksById = new Map(itunesTracks.map((track) => [String(track.trackId), track]));
 
-  return randomSongs.map((song, index) => {
+  return selectedSongs.map((song, index) => {
     return tracksById.get(song.id) ?? {
       trackId: Number(song.id.match(/id(\d+)/)?.[1] ?? index),
       trackName: song.name,

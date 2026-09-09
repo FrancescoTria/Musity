@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import SearchBar from "../components/SearchBar";
 import ThemeToggle from "../components/ThemeToggle";
+import BrandLogo from "../components/BrandLogo";
 import { getRandomAppleChartTracks, getArtwork, ItunesTrack } from "../utils/itunes";
 
 export default function HomePage() {
@@ -29,17 +30,7 @@ export default function HomePage() {
     <div className="min-h-full hero-gradient flex flex-col">
       {/* Nav */}
       <nav className="flex items-center justify-between px-6 py-4 md:px-10">
-        <div className="flex items-center gap-2">
-          <div
-            className="w-8 h-8 rounded-xl flex items-center justify-center text-lg"
-            style={{ background: "var(--primary)", color: "var(--primary-foreground)" }}
-          >
-            ♪
-          </div>
-          <span className="font-display font-bold text-lg tracking-tight" style={{ color: "var(--foreground)" }}>
-            Sounify
-          </span>
-        </div>
+        <BrandLogo />
         <ThemeToggle />
       </nav>
 
@@ -75,19 +66,32 @@ export default function HomePage() {
           Premi Invio o clicca un suggerimento per aprire la pagina del brano
         </p>
 
+        <button
+          onClick={() => navigate("/game")}
+          className="mt-6 flex items-center gap-3 rounded-2xl border px-5 py-3 text-left transition-all hover:scale-[1.02] hover:shadow-lg"
+          style={{ background: "var(--card)", borderColor: "var(--border)" }}
+        >
+          <span className="text-2xl">🎧</span>
+          <span>
+            <span className="block text-sm font-semibold" style={{ color: "var(--foreground)" }}>Indovina la canzone</span>
+            <span className="block text-xs mt-0.5" style={{ color: "var(--muted-foreground)" }}>Sfida le Top Apple Music ascoltando la preview</span>
+          </span>
+        </button>
+
         {/* Trending */}
         <section className="mt-16 w-full max-w-3xl">
-          <div className="mb-4 px-1">
-            <h2 className="text-sm font-semibold" style={{ color: "var(--muted-foreground)" }}>
-              ESPLORA
-            </h2>
-            {exploreLoading ? (
-              <p className="text-xs mt-1" style={{ color: "var(--muted-foreground)" }}>Caricamento brani...</p>
-            ) : (
-              <p className="text-xs mt-1" style={{ color: "var(--muted-foreground)" }}>
-                9 brani casuali dalle Top 100 Apple Music internazionali
-              </p>
-            )}
+          <div className="mb-4 flex items-end justify-between gap-4 px-1">
+            <div>
+              <h2 className="text-sm font-semibold" style={{ color: "var(--muted-foreground)" }}>ESPLORA</h2>
+              {exploreLoading ? (
+                <p className="text-xs mt-1" style={{ color: "var(--muted-foreground)" }}>Caricamento brani...</p>
+              ) : (
+                <p className="text-xs mt-1" style={{ color: "var(--muted-foreground)" }}>
+                  9 brani casuali dalle Top 100 Apple Music internazionali
+                </p>
+              )}
+            </div>
+            <button onClick={() => navigate("/charts")} className="shrink-0 rounded-xl border px-3 py-2 text-xs font-semibold transition-colors hover:bg-[var(--secondary)]" style={{ background: "var(--card)", borderColor: "var(--border)", color: "var(--primary)" }}>Vedi tutte le Top</button>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
             {exploreLoading

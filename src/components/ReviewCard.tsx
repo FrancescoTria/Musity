@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Review, voteReview } from "../utils/ratings";
+import { getSavedVote, Review, saveVote, voteReview, VoteType } from "../utils/ratings";
 import StarRating from "./StarRating";
 
 interface ReviewCardProps {
@@ -8,12 +8,15 @@ interface ReviewCardProps {
 }
 
 export default function ReviewCard({ review, onVote }: ReviewCardProps) {
-  const [voted, setVoted] = useState<"helpful" | "notHelpful" | null>(null);
+  const [voted, setVoted] = useState<VoteType | null>(() =>
+    getSavedVote(review.trackId, review.id)
+  );
 
-  const vote = (type: "helpful" | "notHelpful") => {
-    if (voted) return;
-    voteReview(review.trackId, review.id, type);
-    setVoted(type);
+  const vote = (type: VoteType) => {
+    const nextVote = voted === type ? null : type;
+    voteReview(review.trackId, review.id, voted, type);
+    saveVote(review.trackId, review.id, nextVote);
+    setVoted(nextVote);
     onVote();
   };
 
@@ -68,27 +71,23 @@ export default function ReviewCard({ review, onVote }: ReviewCardProps) {
         <span>Questa recensione ti è stata utile?</span>
         <button
           onClick={() => vote("helpful")}
-          disabled={!!voted}
-          className={`flex items-center gap-1 px-2 py-1 rounded-lg transition-colors ${
-            voted === "helpful"
+          className={`flex items-center gap-1 px-2 py-1 rounded-lg transition-colors ${voted === "helpful"
               ? "bg-emerald-500/20 text-emerald-500"
               : "hover:bg-[var(--secondary)]"
-          } disabled:cursor-default`}
+            }`}
         >
           <span>👍</span>
-          <span>{review.helpful + (voted === "helpful" ? 0 : 0)}</span>
+          <span>{review.helpful}</span>
         </button>
         <button
           onClick={() => vote("notHelpful")}
-          disabled={!!voted}
-          className={`flex items-center gap-1 px-2 py-1 rounded-lg transition-colors ${
-            voted === "notHelpful"
+          className={`flex items-center gap-1 px-2 py-1 rounded-lg transition-colors ${voted === "notHelpful"
               ? "bg-red-500/20 text-red-500"
               : "hover:bg-[var(--secondary)]"
-          } disabled:cursor-default`}
+            }`}
         >
           <span>👎</span>
-          <span>{review.notHelpful + (voted === "notHelpful" ? 0 : 0)}</span>
+          <span>{review.notHelpful}</span>
         </button>
       </div>
     </div>
