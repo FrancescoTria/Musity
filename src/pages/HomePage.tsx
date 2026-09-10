@@ -3,17 +3,24 @@ import { useNavigate } from "react-router-dom";
 import SearchBar from "../components/SearchBar";
 import ThemeToggle from "../components/ThemeToggle";
 import BrandLogo from "../components/BrandLogo";
-import { getRandomAppleChartTracks, getArtwork, ItunesTrack } from "../utils/itunes";
+import { APPLE_MUSIC_COUNTRIES, getAppleChartTracks, getArtwork, ItunesTrack } from "../utils/itunes";
 
 export default function HomePage() {
   const [trending, setTrending] = useState<ItunesTrack[]>([]);
   const [exploreLoading, setExploreLoading] = useState(true);
+  const [country, setCountry] = useState(() => localStorage.getItem("musity-explore-country") ?? "it");
   const navigate = useNavigate();
+  const selectedCountry = APPLE_MUSIC_COUNTRIES.find((item) => item.code === country);
+
+  useEffect(() => {
+    localStorage.setItem("musity-explore-country", country);
+  }, [country]);
 
   useEffect(() => {
     let cancelled = false;
+    setExploreLoading(true);
 
-    getRandomAppleChartTracks()
+    getAppleChartTracks(country, 9)
       .then((tracks) => {
         if (cancelled) return;
         setTrending(tracks);
@@ -24,7 +31,7 @@ export default function HomePage() {
       });
 
     return () => { cancelled = true; };
-  }, []);
+  }, [country]);
 
   return (
     <div className="min-h-full hero-gradient flex flex-col">
@@ -66,17 +73,28 @@ export default function HomePage() {
           Premi Invio o clicca un suggerimento per aprire la pagina del brano
         </p>
 
-        <button
-          onClick={() => navigate("/game")}
-          className="mt-6 flex items-center gap-3 rounded-2xl border px-5 py-3 text-left transition-all hover:scale-[1.02] hover:shadow-lg"
-          style={{ background: "var(--card)", borderColor: "var(--border)" }}
-        >
-          <span className="text-2xl">🎧</span>
-          <span>
-            <span className="block text-sm font-semibold" style={{ color: "var(--foreground)" }}>Indovina la canzone</span>
-            <span className="block text-xs mt-0.5" style={{ color: "var(--muted-foreground)" }}>Sfida le Top Apple Music ascoltando la preview</span>
-          </span>
-        </button>
+        <div className="mt-6 flex w-full max-w-xl flex-col gap-3 sm:flex-row">
+          <button
+            onClick={() => navigate("/game")}
+            className="flex flex-1 items-center justify-center gap-3 rounded-2xl border px-5 py-3 text-center transition-all hover:scale-[1.02] hover:shadow-lg"
+            style={{ background: "var(--card)", borderColor: "var(--border)" }}
+          >
+            <span>
+              <span className="block text-sm font-semibold" style={{ color: "var(--foreground)" }}>Indovina la canzone</span>
+              <span className="block text-xs mt-0.5" style={{ color: "var(--muted-foreground)" }}>Sfida le Top Apple Music ascoltando la preview</span>
+            </span>
+          </button>
+          <button
+            onClick={() => navigate(`/charts?country=${country}`)}
+            className="flex flex-1 items-center justify-center gap-3 rounded-2xl border px-5 py-3 text-center transition-all hover:scale-[1.02] hover:shadow-lg"
+            style={{ background: "var(--card)", borderColor: "var(--border)" }}
+          >
+            <span>
+              <span className="block text-sm font-semibold" style={{ color: "var(--foreground)" }}>Vedi la Top</span>
+              <span className="block text-xs mt-0.5" style={{ color: "var(--muted-foreground)" }}>Apri la Top 100 di {selectedCountry?.name}</span>
+            </span>
+          </button>
+        </div>
 
         {/* Trending */}
         <section className="mt-16 w-full max-w-3xl">
@@ -87,11 +105,23 @@ export default function HomePage() {
                 <p className="text-xs mt-1" style={{ color: "var(--muted-foreground)" }}>Caricamento brani...</p>
               ) : (
                 <p className="text-xs mt-1" style={{ color: "var(--muted-foreground)" }}>
-                  9 brani casuali dalle Top 100 Apple Music internazionali
+                  9 brani casuali dalla Top 100 Apple Music {selectedCountry?.name}
                 </p>
               )}
             </div>
-            <button onClick={() => navigate("/charts")} className="shrink-0 rounded-xl border px-3 py-2 text-xs font-semibold transition-colors hover:bg-[var(--secondary)]" style={{ background: "var(--card)", borderColor: "var(--border)", color: "var(--primary)" }}>Vedi tutte le Top</button>
+            <label className="shrink-0">
+              <span className="sr-only">Cambia regione</span>
+              <select
+                value={country}
+                onChange={(event) => setCountry(event.target.value)}
+                className="rounded-xl border px-3 py-2 text-xs font-semibold outline-none transition-colors focus:border-[var(--primary)]"
+                style={{ background: "var(--card)", borderColor: "var(--border)", color: "var(--primary)" }}
+              >
+                {APPLE_MUSIC_COUNTRIES.map((item) => (
+                  <option key={item.code} value={item.code}>{item.flag} {item.name}</option>
+                ))}
+              </select>
+            </label>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
             {exploreLoading
