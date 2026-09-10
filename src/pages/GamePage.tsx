@@ -112,7 +112,7 @@ export default function GamePage() {
         setStatus("loading");
         setError("");
         try {
-            const chart = await getAppleChartTracks(country, 50);
+            const chart = await getAppleChartTracks(country, 100);
             const playableChart = chart.filter((track) => track.previewUrl);
             const playable = playableChart.slice(0, TOTAL_ROUNDS);
             if (playable.length < TOTAL_ROUNDS) {

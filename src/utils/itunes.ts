@@ -175,11 +175,11 @@ export async function getFullAppleChartTracks(storefront: string): Promise<Itune
 }
 
 async function fetchChartSongs(storefront: string, limit: number): Promise<AppleChartSong[]> {
-  const res = await fetch(`https://rss.applemarketingtools.com/api/v2/${storefront}/music/most-played/${limit}/songs.json`);
+  const res = await fetch(`${import.meta.env.BASE_URL}charts/${storefront}.json`);
   if (!res.ok) throw new Error("Music chart unavailable");
   const data: AppleChartResponse = await res.json();
 
-  return data.feed.results.map((entry) => ({
+  return data.feed.results.slice(0, 100).map((entry) => ({
     id: entry.id,
     name: entry.name,
     artistName: entry.artistName,
