@@ -53,6 +53,20 @@ interface ItunesRssResponse {
   feed: { entry: ItunesRssEntry[] };
 }
 
+interface AppleChartResponse {
+  feed: {
+    results: Array<{
+      id: string;
+      name: string;
+      artistName: string;
+      artworkUrl100: string;
+      url: string;
+      releaseDate: string;
+      genres?: { name: string }[];
+    }>;
+  };
+}
+
 export const APPLE_MUSIC_COUNTRIES = [
   { code: "us", name: "Stati Uniti", flag: "🇺🇸" },
   { code: "ca", name: "Canada", flag: "🇨🇦" },
@@ -161,18 +175,18 @@ export async function getFullAppleChartTracks(storefront: string): Promise<Itune
 }
 
 async function fetchChartSongs(storefront: string, limit: number): Promise<AppleChartSong[]> {
-  const res = await fetch(`https://itunes.apple.com/${storefront}/rss/topsongs/${limit}/explicit/json`);
+  const res = await fetch(`https://rss.applemarketingtools.com/api/v2/${storefront}/music/most-played/${limit}/songs.json`);
   if (!res.ok) throw new Error("Music chart unavailable");
-  const data: ItunesRssResponse = await res.json();
+  const data: AppleChartResponse = await res.json();
 
-  return data.feed.entry.map((entry) => ({
-    id: entry.id.attributes["im:id"],
-    name: entry["im:name"].label,
-    artistName: entry["im:artist"].label,
-    artworkUrl100: entry["im:image"].at(-1)?.label ?? "",
-    url: entry.link.find((link) => link.attributes.rel === "alternate")?.attributes.href ?? entry.id.attributes["im:id"],
-    releaseDate: entry["im:releaseDate"]?.label ?? "",
-    genres: entry.category?.attributes?.label ? [{ name: entry.category.attributes.label }] : [],
+  return data.feed.results.map((entry) => ({
+    id: entry.id,
+    name: entry.name,
+    artistName: entry.artistName,
+    artworkUrl100: entry.artworkUrl100,
+    url: entry.url,
+    releaseDate: entry.releaseDate,
+    genres: entry.genres ?? [],
   }));
 }
 
