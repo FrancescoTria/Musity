@@ -35,16 +35,23 @@ interface AppleChartSong {
   genres?: { name: string }[];
 }
 
-interface AppleChartResponse {
-  feed: {
-    results: AppleChartSong[];
-  };
+const NON_AMERICAN_STOREFRONTS = ["it", "gb", "jp", "de", "fr", "es", "au", "kr", "in"];
+
+interface ItunesRssEntry {
+  "im:name": { label: string };
+  "im:image": { label: string }[];
+  "im:collection"?: { "im:name": { label: string } };
+  title: { label: string };
+  link: { attributes: { rel: string; href: string } }[];
+  id: { attributes: { "im:id": string } };
+  "im:artist": { label: string };
+  category?: { attributes?: { label?: string } };
+  "im:releaseDate"?: { label: string };
 }
 
-const NON_AMERICAN_STOREFRONTS = ["it", "gb", "jp", "de", "fr", "es", "au", "kr", "in"];
-const APPLE_MUSIC_API_BASE = import.meta.env.DEV
-  ? "/api/apple-music"
-  : "https://rss.marketingtools.apple.com/api";
+interface ItunesRssResponse {
+  feed: { entry: ItunesRssEntry[] };
+}
 
 export const APPLE_MUSIC_COUNTRIES = [
   { code: "us", name: "Stati Uniti", flag: "🇺🇸" },
@@ -127,19 +134,10 @@ export async function getRandomAppleChartTracks(): Promise<ItunesTrack[]> {
 
   const responses = await Promise.all(
     NON_AMERICAN_STOREFRONTS.map(async (storefront) => {
-      const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 5000);
       try {
-        const res = await fetch(`${APPLE_MUSIC_API_BASE}/v2/${storefront}/music/most-played/100/songs.json`, {
-          signal: controller.signal,
-        });
-        if (!res.ok) return [];
-        const data: AppleChartResponse = await res.json();
-        return data.feed.results;
+        return await fetchChartSongs(storefront, 100);
       } catch {
         return [];
-      } finally {
-        clearTimeout(timeout);
       }
     }),
   );
@@ -155,17 +153,27 @@ export async function getAppleChartTracks(
   storefront: string,
   limit = 25,
 ): Promise<ItunesTrack[]> {
-  const res = await fetch(`${APPLE_MUSIC_API_BASE}/v2/${storefront}/music/most-played/${limit}/songs.json`);
-  if (!res.ok) throw new Error("Apple Music chart unavailable");
-  const data: AppleChartResponse = await res.json();
-  return enrichAppleChartTracks(data.feed.results, limit);
+  return enrichAppleChartTracks(await fetchChartSongs(storefront, limit), limit);
 }
 
 export async function getFullAppleChartTracks(storefront: string): Promise<ItunesTrack[]> {
-  const res = await fetch(`${APPLE_MUSIC_API_BASE}/v2/${storefront}/music/most-played/100/songs.json`);
-  if (!res.ok) throw new Error("Apple Music chart unavailable");
-  const data: AppleChartResponse = await res.json();
-  return enrichAppleChartTracks(data.feed.results, 100, false);
+  return enrichAppleChartTracks(await fetchChartSongs(storefront, 100), 100, false);
+}
+
+async function fetchChartSongs(storefront: string, limit: number): Promise<AppleChartSong[]> {
+  const res = await fetch(`https://itunes.apple.com/${storefront}/rss/topsongs/${limit}/explicit/json`);
+  if (!res.ok) throw new Error("Music chart unavailable");
+  const data: ItunesRssResponse = await res.json();
+
+  return data.feed.entry.map((entry) => ({
+    id: entry.id.attributes["im:id"],
+    name: entry["im:name"].label,
+    artistName: entry["im:artist"].label,
+    artworkUrl100: entry["im:image"].at(-1)?.label ?? "",
+    url: entry.link.find((link) => link.attributes.rel === "alternate")?.attributes.href ?? entry.id.attributes["im:id"],
+    releaseDate: entry["im:releaseDate"]?.label ?? "",
+    genres: entry.category?.attributes?.label ? [{ name: entry.category.attributes.label }] : [],
+  }));
 }
 
 async function enrichAppleChartTracks(songs: AppleChartSong[], limit = 9, randomize = true): Promise<ItunesTrack[]> {
