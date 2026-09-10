@@ -42,6 +42,9 @@ interface AppleChartResponse {
 }
 
 const NON_AMERICAN_STOREFRONTS = ["it", "gb", "jp", "de", "fr", "es", "au", "kr", "in"];
+const APPLE_MUSIC_API_BASE = import.meta.env.DEV
+  ? "/api/apple-music"
+  : "https://rss.marketingtools.apple.com/api";
 
 export const APPLE_MUSIC_COUNTRIES = [
   { code: "us", name: "Stati Uniti", flag: "🇺🇸" },
@@ -127,7 +130,7 @@ export async function getRandomAppleChartTracks(): Promise<ItunesTrack[]> {
       const controller = new AbortController();
       const timeout = setTimeout(() => controller.abort(), 5000);
       try {
-        const res = await fetch(`/api/apple-music/api/v2/${storefront}/music/most-played/100/songs.json`, {
+        const res = await fetch(`${APPLE_MUSIC_API_BASE}/v2/${storefront}/music/most-played/100/songs.json`, {
           signal: controller.signal,
         });
         if (!res.ok) return [];
@@ -152,14 +155,14 @@ export async function getAppleChartTracks(
   storefront: string,
   limit = 25,
 ): Promise<ItunesTrack[]> {
-  const res = await fetch(`/api/apple-music/api/v2/${storefront}/music/most-played/${limit}/songs.json`);
+  const res = await fetch(`${APPLE_MUSIC_API_BASE}/v2/${storefront}/music/most-played/${limit}/songs.json`);
   if (!res.ok) throw new Error("Apple Music chart unavailable");
   const data: AppleChartResponse = await res.json();
   return enrichAppleChartTracks(data.feed.results, limit);
 }
 
 export async function getFullAppleChartTracks(storefront: string): Promise<ItunesTrack[]> {
-  const res = await fetch(`/api/apple-music/api/v2/${storefront}/music/most-played/100/songs.json`);
+  const res = await fetch(`${APPLE_MUSIC_API_BASE}/v2/${storefront}/music/most-played/100/songs.json`);
   if (!res.ok) throw new Error("Apple Music chart unavailable");
   const data: AppleChartResponse = await res.json();
   return enrichAppleChartTracks(data.feed.results, 100, false);

@@ -4,6 +4,7 @@ import tailwindcss from '@tailwindcss/vite'
 
 // Vite config — https://vitejs.dev/config/
 export default defineConfig({
+  base: '/Musity/',
   plugins: [react(), tailwindcss()],
   server: {
     proxy: {

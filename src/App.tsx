@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { HashRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "./context/ThemeContext";
 import HomePage from "./pages/HomePage";
 import TrackPage from "./pages/TrackPage";
@@ -8,14 +8,14 @@ import ChartsPage from "./pages/ChartsPage";
 export default function App() {
   return (
     <ThemeProvider>
-      <BrowserRouter>
+      <HashRouter>
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/track/:trackId" element={<TrackPage />} />
           <Route path="/game" element={<GamePage />} />
           <Route path="/charts" element={<ChartsPage />} />
         </Routes>
-      </BrowserRouter>
+      </HashRouter>
     </ThemeProvider>
   );
 }
